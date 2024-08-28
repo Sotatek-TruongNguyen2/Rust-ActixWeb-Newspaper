@@ -4,9 +4,23 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+config = "0.11"
 actix-web = "4.9.0"
 reqwest = "0.12.7"
 serde = { version = "1.0.208", features = ["derive"] }
+sqlx = { version = "0.8.0", features = [ "runtime-tokio", "tls-rustls",  "macros", "postgres", "uuid", "chrono", "migrate" ] }
+serde_json = "1.0.127"
+uuid =  {version = "1.10.0", features = ["v4", "fast-rng", "macro-diagnostics"] }
+chrono = "0.4.38"
+env_logger = "0.11.5"
+log = "0.4.22"
+tracing = { version = "0.1", features = ["log"] }
+tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
+tracing-bunyan-formatter = "0.3"
+tracing-log = "0.1"
+once_cell = "1.19.0"
+# solana-program = "1.17.0"
+# borsh = { version= "1.5.1", features = ["derive"]}
 
 [target.x86_64-apple-darwin]
 rustflags = ["-C", "link-arg=-fuse-ld=/usr/local/bin/zld"]
@@ -24,3 +38,11 @@ path = "src/lib.rs"
 [[bin]]
 path = "src/main.rs"
 name = "zero2prod"
+
+# [patch.crates-io.aes-gcm-siv]
+# git = "https://github.com/RustCrypto/AEADs"
+# rev = "6105d7a5591aefa646a95d12b5e8d3f55a9214ef"
+#
+# [patch.crates-io.curve25519-dalek]
+# git = "https://github.com/solana-labs/curve25519-dalek.git"
+# rev = "c14774464c4d38de553c6ef2f48a10982c1b4801"

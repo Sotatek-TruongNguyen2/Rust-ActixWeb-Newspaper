@@ -1,32 +1,25 @@
+pub mod configuration;
+pub mod routes;
+pub mod startup;
+pub mod telemetry;
+
 use std::net::TcpListener;
 
-use actix_web::{dev::Server, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
-use serde::Deserialize;
+use actix_web::{dev::Server, middleware::Logger, web, App, HttpServer};
+use routes::{health_check, subscribe};
+use sqlx::PgPool;
 
-#[derive(Deserialize)]
-struct FormData {
-    email: String,
-    name: String,
-}
+pub fn run(listener: TcpListener, db_pool: PgPool) -> std::io::Result<Server> {
+    // Wrap the connection in a smart pointer
+    let connection = web::Data::new(db_pool);
 
-async fn health_check(_req: HttpRequest) -> impl Responder {
-    HttpResponse::Ok()
-}
-
-// Let's start simple: we always return a 200 OK
-async fn subscribe(_form: web::Form<FormData>) -> impl Responder {
-    println!("{}", _form.name);
-    HttpResponse::Ok().finish()
-}
-
-pub fn run(listener: TcpListener) -> std::io::Result<Server> {
-    let server = HttpServer::new(|| {
+    let server = HttpServer::new(move || {
         //App::new().route("/", web::)
         App::new()
-            //.route("/", web::get().to(greet))
-            //.route("/{name}", web::get().to(greet))
+            .wrap(Logger::default())
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
+            .app_data(connection.clone())
     })
     .listen(listener)?
     .run();
