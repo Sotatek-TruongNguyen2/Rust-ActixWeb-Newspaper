@@ -1,5 +1,6 @@
 use reqwest::StatusCode;
-use sqlx::{Connection, Executor, PgConnection, PgPool};
+// use secrecy::ExposeSecret;
+use sqlx::{Executor, PgPool};
 use std::net::TcpListener;
 use uuid::Uuid;
 use zero2prod::{
@@ -17,7 +18,6 @@ static TRACING: Lazy<()> = Lazy::new(|| {
     // We cannot assign the output of `get_subscriber` to a variable based on the value of `TEST_LOG` // because the sink is part of the type returned by `get_subscriber`, therefore they are not the
     // same type. We could work around it, but this is the most straight-forward way of moving forward.
     if std::env::var("TEST_LOG").is_ok() {
-        println!("Sth in here");
         let subscriber = get_subscriber(subscriber_name, default_filter_level, std::io::stdout);
         init_subscriber(subscriber);
     } else {
@@ -55,18 +55,22 @@ async fn spawn_app() -> TestApp {
 
 pub async fn configure_database(config: &DatabaseSettings) -> PgPool {
     // Create database
-    let mut connection = PgConnection::connect(&config.connection_string_without_db())
+    // let mut connection = PgConnection::connect_with(&config.without_db())
+    //     .await
+    //     .expect("Failed to connect to Postgres");
+
+    // connection
+    //     .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
+    //     .await
+    //     .expect("Failed to create database.");
+    let connection_pool = PgPool::connect_with(config.without_db())
         .await
         .expect("Failed to connect to Postgres");
 
-    connection
+    connection_pool
         .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
         .await
         .expect("Failed to create database.");
-
-    let connection_pool = PgPool::connect(&config.connection_string())
-        .await
-        .expect("Failed to connect to Postgres");
 
     sqlx::migrate!("./migrations")
         .run(&connection_pool)
