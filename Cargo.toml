@@ -8,7 +8,7 @@ config = "0.11"
 actix-web = "4.9.0"
 reqwest = { version = "0.12.7", features = ["json"] }
 serde = { version = "1.0.208", features = ["derive"] }
-sqlx = { version = "0.8.0", features = [ "runtime-tokio", "tls-rustls",  "macros", "postgres", "uuid", "chrono", "migrate" ] }
+sqlx = { version = "0.8.2", features = [ "runtime-tokio", "tls-rustls",  "macros", "postgres", "uuid", "chrono", "migrate" ] }
 serde_json = "1.0.127"
 uuid =  {version = "1.10.0", features = ["v4", "fast-rng", "macro-diagnostics"] }
 chrono = "0.4.38"
@@ -26,6 +26,7 @@ unicode-segmentation = "1.11.0"
 validator = { version = "0.18.1", features = ["derive"] }
 wiremock = "0.6.2"
 linkify = "0.10.0"
+rand = { version = "0.8", features=["std_rng"] }
 
 [dev-dependencies]
 quickcheck = "0.9.2"
